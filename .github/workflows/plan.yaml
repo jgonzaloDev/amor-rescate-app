@@ -1,0 +1,52 @@
+name: Terraform Plan
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+   
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan \
+          -var subscription_id=${{ vars.AZURE_SUBSCRIPTION_ID }} \
+          -var tenant_id=${{ vars.AZURE_TENANT_ID }} \
+          -var location=${{ vars.LOCATION }} \
+          -var resource_group_name=${{ vars.RESOURCE_GROUP_NAME }} \
+          -var vnet_name=${{ vars.VNET_NAME }} \
+          -var address_space='["10.0.0.0/16"]' \
+          -var subnet_ag_cidr=${{ vars.SUBNET_AG_CIDR }} \
+          -var subnet_integration_cidr=${{ vars.SUBNET_INTEGRATION_CIDR }} \
+          -var subnet_privateendpoint_cidr=${{ vars.SUBNET_PRIVATEENDPOINT_CIDR }} \
+          -var app_service_plan_name=${{ vars.APP_SERVICE_PLAN_NAME }} \
+          -var webapp_name=${{ vars.WEBAPP_NAME }} \
+          -var sql_server_name=${{ vars.SQL_SERVER_NAME }} \
+          -var sql_database_name=${{ vars.SQL_DATABASE_NAME }} \
+          -var key_vault_name=${{ vars.KEY_VAULT_NAME }} \
+          -var sql_admin_login=${{ secrets.SQL_ADMIN_LOGIN }} \
+          -var sql_admin_password=${{ secrets.SQL_ADMIN_PASSWORD }}
+
