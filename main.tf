@@ -60,10 +60,10 @@ resource "azurerm_subnet" "subnet_integration" {
 
 # Subnet Private Endpoint
 resource "azurerm_subnet" "subnet_pe" {
-  name                 = "subnet-privateEndPoint"
-  resource_group_name  = azurerm_resource_group.rg.name
-  virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = [var.subnet_privateendpoint_cidr]
+  name                          = "subnet-privateEndPoint"
+  resource_group_name           = azurerm_resource_group.rg.name
+  virtual_network_name          = azurerm_virtual_network.vnet.name
+  address_prefixes              = [var.subnet_privateendpoint_cidr]
   private_endpoint_network_policies = "Disabled"
 }
 
@@ -130,16 +130,16 @@ resource "azurerm_mssql_database" "db" {
 # Key Vault privado + RBAC
 # =========================================================
 resource "azurerm_key_vault" "kv" {
-  name                = var.key_vault_name
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  tenant_id           = var.tenant_id
-  sku_name            = "standard"
+  name                        = var.key_vault_name
+  location                    = azurerm_resource_group.rg.location
+  resource_group_name         = azurerm_resource_group.rg.name
+  tenant_id                   = var.tenant_id
+  sku_name                    = "standard"
 
-  soft_delete_retention_days    = 7
-  purge_protection_enabled      = false
+  soft_delete_retention_days   = 7
+  purge_protection_enabled     = false
   public_network_access_enabled = false
-  enable_rbac_authorization     = true
+  enable_rbac_authorization    = true
 }
 
 resource "azurerm_role_assignment" "kv_secrets_officer" {
@@ -299,7 +299,8 @@ resource "azurerm_application_gateway" "agw" {
 
   backend_address_pool {
     name = "pool-webapp-pe"
-    backend_address {
+
+    backend_addresses {
       ip_address = local.webapp_pe_private_ip
     }
   }
@@ -327,10 +328,6 @@ resource "azurerm_application_gateway" "agw" {
     backend_http_settings_name = "bhs-http"
     priority                   = 10
   }
-
-  depends_on = [
-    azurerm_private_endpoint.pe_web
-  ]
 }
 
 # =========================================================
