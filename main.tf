@@ -300,7 +300,7 @@ resource "azurerm_application_gateway" "agw" {
   backend_address_pool {
     name = "pool-webapp-pe"
 
-    backend_addresses {
+    backend_address {
       ip_address = local.webapp_pe_private_ip
     }
   }
