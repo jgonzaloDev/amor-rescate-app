@@ -91,7 +91,7 @@ resource "azurerm_windows_web_app" "web" {
   }
 
   site_config {
-    always_on             = true
+    always_on              = true
     vnet_route_all_enabled = true
   }
 
@@ -110,12 +110,12 @@ resource "azurerm_app_service_virtual_network_swift_connection" "web_integration
 # SQL Server + Database
 # =========================================================
 resource "azurerm_mssql_server" "sql" {
-  name                         = var.sql_server_name
-  resource_group_name          = azurerm_resource_group.rg.name
-  location                     = azurerm_resource_group.rg.location
-  version                      = "12.0"
-  administrator_login          = var.sql_admin_login
-  administrator_login_password = var.sql_admin_password
+  name                          = var.sql_server_name
+  resource_group_name           = azurerm_resource_group.rg.name
+  location                      = azurerm_resource_group.rg.location
+  version                       = "12.0"
+  administrator_login           = var.sql_admin_login
+  administrator_login_password  = var.sql_admin_password
   public_network_access_enabled = false
 }
 
@@ -136,10 +136,10 @@ resource "azurerm_key_vault" "kv" {
   tenant_id           = var.tenant_id
   sku_name            = "standard"
 
-  soft_delete_retention_days   = 7
-  purge_protection_enabled     = false
+  soft_delete_retention_days    = 7
+  purge_protection_enabled      = false
   public_network_access_enabled = false
-  enable_rbac_authorization    = true
+  enable_rbac_authorization     = true
 }
 
 resource "azurerm_role_assignment" "kv_secrets_officer" {
@@ -299,7 +299,7 @@ resource "azurerm_application_gateway" "agw" {
 
   backend_address_pool {
     name = "pool-webapp-pe"
-    backend_addresses {
+    backend_address {
       ip_address = local.webapp_pe_private_ip
     }
   }
@@ -327,6 +327,10 @@ resource "azurerm_application_gateway" "agw" {
     backend_http_settings_name = "bhs-http"
     priority                   = 10
   }
+
+  depends_on = [
+    azurerm_private_endpoint.pe_web
+  ]
 }
 
 # =========================================================
