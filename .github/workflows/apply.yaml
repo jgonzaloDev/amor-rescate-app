@@ -42,8 +42,11 @@ jobs:
           # Key Vault
           TF_VAR_key_vault_name: ${{ secrets.TF_VAR_KEY_VAULT_NAME }}
 
-          # OIDC federated principal
+          # OIDC GitHub federated principal
           TF_VAR_github_principal_id: ${{ secrets.AZURE_FEDERATED_OBJID }}
+
+          # Usuario administrador (TÚ)
+          TF_VAR_admin_user_object_id: ${{ secrets.ADMIN_USER_OBJECT_ID }}
 
           # Secretos
           TF_VAR_secret_bd_datos: ${{ secrets.SECRET_BD_DATOS }}

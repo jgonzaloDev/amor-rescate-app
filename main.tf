@@ -23,7 +23,7 @@ resource "azurerm_resource_group" "dojo" {
 }
 
 ###############################################################
-# 2️⃣ Key Vault con IAM
+# 2️⃣ Key Vault con RBAC
 ###############################################################
 resource "azurerm_key_vault" "kv" {
   name                        = var.key_vault_name
@@ -37,7 +37,7 @@ resource "azurerm_key_vault" "kv" {
 }
 
 ###############################################################
-# 3️⃣ Asignar rol IAM (Secrets Officer) a GitHub OIDC
+# 3️⃣ GitHub OIDC → Key Vault Secrets Officer
 ###############################################################
 resource "azurerm_role_assignment" "github_kv_secrets" {
   scope                = azurerm_key_vault.kv.id
@@ -46,15 +46,27 @@ resource "azurerm_role_assignment" "github_kv_secrets" {
 }
 
 ###############################################################
-# 4️⃣ Propagación IAM (tiempo real de Azure RBAC)
+# 4️⃣ 🔐 TU USUARIO → Key Vault Administrator
+###############################################################
+resource "azurerm_role_assignment" "user_kv_admin" {
+  scope                = azurerm_key_vault.kv.id
+  role_definition_name = "Key Vault Administrator"
+  principal_id         = "d367b5ee-a181-4d51-824a-70861fd4a79c" # TU OBJECT ID REAL
+}
+
+###############################################################
+# 5️⃣ Propagación RBAC (Azure se demora)
 ###############################################################
 resource "time_sleep" "wait_for_iam" {
-  depends_on      = [azurerm_role_assignment.github_kv_secrets]
+  depends_on = [
+    azurerm_role_assignment.github_kv_secrets,
+    azurerm_role_assignment.user_kv_admin
+  ]
   create_duration = "45s"
 }
 
 ###############################################################
-# 5️⃣ Secretos del Key Vault
+# 6️⃣ Secretos del Key Vault
 ###############################################################
 resource "azurerm_key_vault_secret" "bd_datos" {
   name         = "BDdatos"
