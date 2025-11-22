@@ -54,8 +54,8 @@ jobs:
           # Usuario administrador (TÚ)
           TF_VAR_admin_user_object_id: ${{ secrets.ADMIN_USER_OBJECT_ID }}
 
-          # Secretos del Key Vault
-          TF_VAR_secret_bd_datos: ${{ secrets.TF_VAR_SQL_DATABASE_NAME }}
-          TF_VAR_secret_userbd: ${{ secrets.TF_VAR_SQL_ADMIN_LOGIN }}
-          TF_VAR_secret_passwordbd: ${{ secrets.TF_VAR_SQL_ADMIN_PASSWORD }}
+          # Secretos del Key Vault (desde GitHub)
+          TF_VAR_secret_bd_datos:    ${{ secrets.TF_VAR_SQL_DATABASE_NAME }}
+          TF_VAR_secret_userbd:      ${{ secrets.TF_VAR_SQL_ADMIN_LOGIN }}
+          TF_VAR_secret_passwordbd:  ${{ secrets.TF_VAR_SQL_ADMIN_PASSWORD }}
 
