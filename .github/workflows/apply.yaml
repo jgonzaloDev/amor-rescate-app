@@ -9,7 +9,7 @@ on:
 jobs:
   terraform:
     runs-on: ubuntu-latest
-   
+
     permissions:
       id-token: write
       contents: read
@@ -38,17 +38,14 @@ jobs:
           TF_VAR_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
           TF_VAR_location: ${{ secrets.TF_VAR_LOCATION }}
           TF_VAR_resource_group_name: ${{ secrets.TF_VAR_RESOURCE_GROUP_NAME }}
-          TF_VAR_vnet_name: ${{ secrets.TF_VAR_VNET_NAME }}
-          TF_VAR_address_space: ${{ secrets.TF_VAR_ADDRESS_SPACE }}
-          TF_VAR_subnet_ag_cidr: ${{ secrets.TF_VAR_SUBNET_AG_CIDR }}
-          TF_VAR_subnet_integration_cidr: ${{ secrets.TF_VAR_SUBNET_INTEGRATION_CIDR }}
-          TF_VAR_subnet_privateendpoint_cidr: ${{ secrets.TF_VAR_SUBNET_PRIVATEENDPOINT_CIDR }}
-          TF_VAR_app_service_plan_name: ${{ secrets.TF_VAR_APP_SERVICE_PLAN_NAME }}
-          TF_VAR_webapp_name: ${{ secrets.TF_VAR_WEBAPP_NAME }}
-          TF_VAR_sql_server_name: ${{ secrets.TF_VAR_SQL_SERVER_NAME }}
-          TF_VAR_sql_database_name: ${{ secrets.TF_VAR_SQL_DATABASE_NAME }}
-          TF_VAR_key_vault_name: ${{ secrets.TF_VAR_KEY_VAULT_NAME }}
-          TF_VAR_sql_admin_login: ${{ secrets.TF_VAR_SQL_ADMIN_LOGIN }}
-          TF_VAR_sql_admin_password: ${{ secrets.TF_VAR_SQL_ADMIN_PASSWORD }}
 
-          
+          # Key Vault
+          TF_VAR_key_vault_name: ${{ secrets.TF_VAR_KEY_VAULT_NAME }}
+
+          # OIDC federated principal
+          TF_VAR_github_principal_id: ${{ secrets.AZURE_FEDERATED_OBJID }}
+
+          # Secretos
+          TF_VAR_secret_bd_datos: ${{ secrets.SECRET_BD_DATOS }}
+          TF_VAR_secret_userbd: ${{ secrets.SECRET_USERBD }}
+          TF_VAR_secret_passwordbd: ${{ secrets.SECRET_PASSWORDBD }}
