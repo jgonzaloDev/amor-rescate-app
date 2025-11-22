@@ -65,7 +65,6 @@ resource "time_sleep" "wait_for_iam" {
   ]
   create_duration = "45s"
 }
-
 ###############################################################
 # 6️⃣ Secretos del Key Vault — OPCIÓN A (NO falla si ya existen)
 ###############################################################
@@ -73,17 +72,17 @@ resource "time_sleep" "wait_for_iam" {
 ########################
 # BDdatos
 ########################
+locals {
+  bd_datos_existing = try(data.azurerm_key_vault_secret.bd_datos_existing.value, "")
+}
+
 data "azurerm_key_vault_secret" "bd_datos_existing" {
   name         = "BDdatos"
   key_vault_id = azurerm_key_vault.kv.id
-
-  lifecycle {
-    ignore_errors = true
-  }
 }
 
 resource "azurerm_key_vault_secret" "bd_datos" {
-  count = data.azurerm_key_vault_secret.bd_datos_existing.id == "" ? 1 : 0
+  count = local.bd_datos_existing == "" ? 1 : 0
 
   name         = "BDdatos"
   value        = var.secret_bd_datos
@@ -94,17 +93,17 @@ resource "azurerm_key_vault_secret" "bd_datos" {
 ########################
 # userbd
 ########################
+locals {
+  userbd_existing = try(data.azurerm_key_vault_secret.userbd_existing.value, "")
+}
+
 data "azurerm_key_vault_secret" "userbd_existing" {
   name         = "userbd"
   key_vault_id = azurerm_key_vault.kv.id
-
-  lifecycle {
-    ignore_errors = true
-  }
 }
 
 resource "azurerm_key_vault_secret" "userbd" {
-  count = data.azurerm_key_vault_secret.userbd_existing.id == "" ? 1 : 0
+  count = local.userbd_existing == "" ? 1 : 0
 
   name         = "userbd"
   value        = var.secret_userbd
@@ -115,17 +114,17 @@ resource "azurerm_key_vault_secret" "userbd" {
 ########################
 # passwordbd
 ########################
+locals {
+  passwordbd_existing = try(data.azurerm_key_vault_secret.passwordbd_existing.value, "")
+}
+
 data "azurerm_key_vault_secret" "passwordbd_existing" {
   name         = "passwordbd"
   key_vault_id = azurerm_key_vault.kv.id
-
-  lifecycle {
-    ignore_errors = true
-  }
 }
 
 resource "azurerm_key_vault_secret" "passwordbd" {
-  count = data.azurerm_key_vault_secret.passwordbd_existing.id == "" ? 1 : 0
+  count = local.passwordbd_existing == "" ? 1 : 0
 
   name         = "passwordbd"
   value        = var.secret_passwordbd
