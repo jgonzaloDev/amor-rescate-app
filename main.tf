@@ -65,47 +65,26 @@ resource "time_sleep" "wait_for_iam" {
   ]
   create_duration = "45s"
 }
+
 ###############################################################
-# 6️⃣ Secretos del Key Vault — OPCIÓN A (NO falla si ya existen)
+# 6️⃣ Secretos del Key Vault (LECTURA, nunca creación)
+# 🚀 100% AUTOMÁTICO – NO FALLA – NO REQUIERE IMPORTAR
 ###############################################################
-resource "azurerm_key_vault_secret" "bd_datos" {
+
+data "azurerm_key_vault_secret" "bd_datos" {
   name         = "BDdatos"
-  value        = var.secret_bd_datos
   key_vault_id = azurerm_key_vault.kv.id
-
-  depends_on = [time_sleep.wait_for_iam]
-
-  lifecycle {
-    ignore_changes = [
-      value
-    ]
-  }
+  depends_on   = [time_sleep.wait_for_iam]
 }
 
-resource "azurerm_key_vault_secret" "userbd" {
+data "azurerm_key_vault_secret" "userbd" {
   name         = "userbd"
-  value        = var.secret_userbd
   key_vault_id = azurerm_key_vault.kv.id
-
-  depends_on = [time_sleep.wait_for_iam]
-
-  lifecycle {
-    ignore_changes = [
-      value
-    ]
-  }
+  depends_on   = [time_sleep.wait_for_iam]
 }
 
-resource "azurerm_key_vault_secret" "passwordbd" {
+data "azurerm_key_vault_secret" "passwordbd" {
   name         = "passwordbd"
-  value        = var.secret_passwordbd
   key_vault_id = azurerm_key_vault.kv.id
-
-  depends_on = [time_sleep.wait_for_iam]
-
-  lifecycle {
-    ignore_changes = [
-      value
-    ]
-  }
+  depends_on   = [time_sleep.wait_for_iam]
 }
