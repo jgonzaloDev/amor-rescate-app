@@ -73,32 +73,47 @@ resource "time_sleep" "wait_for_iam" {
 }
 
 ###############################################################
-# 6️⃣ Creación de secretos en Key Vault
+# 6️⃣ Creación o adopción de secretos (NO FALLA)
 ###############################################################
 
 resource "azurerm_key_vault_secret" "bd_datos" {
   name         = "BDdatos"
   value        = var.sql_database_name
   key_vault_id = azurerm_key_vault.kv.id
-  depends_on   = [time_sleep.wait_for_iam]
+
+  lifecycle {
+    ignore_changes = [ value ]
+  }
+
+  depends_on = [time_sleep.wait_for_iam]
 }
 
 resource "azurerm_key_vault_secret" "userbd" {
   name         = "userbd"
   value        = var.sql_admin_login
   key_vault_id = azurerm_key_vault.kv.id
-  depends_on   = [time_sleep.wait_for_iam]
+
+  lifecycle {
+    ignore_changes = [ value ]
+  }
+
+  depends_on = [time_sleep.wait_for_iam]
 }
 
 resource "azurerm_key_vault_secret" "passwordbd" {
   name         = "passwordbd"
   value        = var.sql_admin_password
   key_vault_id = azurerm_key_vault.kv.id
-  depends_on   = [time_sleep.wait_for_iam]
+
+  lifecycle {
+    ignore_changes = [ value ]
+  }
+
+  depends_on = [time_sleep.wait_for_iam]
 }
 
 ###############################################################
-# 7️⃣ Lectura de los secretos (YA con valor)
+# 7️⃣ Lectura final de los secretos (ya existen o creados)
 ###############################################################
 
 data "azurerm_key_vault_secret" "bd_datos_read" {
