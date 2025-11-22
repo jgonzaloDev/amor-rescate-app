@@ -26,6 +26,12 @@ variable "github_principal_id" {
   description = "Object ID del GitHub Federated Credential"
 }
 
+# IAM para ti (usuario administrador del Key Vault)
+variable "admin_user_object_id" {
+  type        = string
+  description = "Object ID del usuario administrador que puede leer y crear secretos"
+}
+
 # Secrets
 variable "secret_bd_datos" {
   type = string

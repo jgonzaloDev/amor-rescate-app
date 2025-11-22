@@ -30,6 +30,7 @@ resource "azurerm_key_vault" "kv" {
   resource_group_name         = azurerm_resource_group.dojo.name
   location                    = azurerm_resource_group.dojo.location
   tenant_id                   = var.tenant_id
+
   sku_name                   = "standard"
   soft_delete_retention_days = 7
   purge_protection_enabled   = false
@@ -51,7 +52,7 @@ resource "azurerm_role_assignment" "github_kv_secrets" {
 resource "azurerm_role_assignment" "user_kv_admin" {
   scope                = azurerm_key_vault.kv.id
   role_definition_name = "Key Vault Administrator"
-  principal_id         = "d367b5ee-a181-4d51-824a-70861fd4a79c" # TU OBJECT ID REAL
+  principal_id         = "d367b5ee-a181-4d51-824a-70861fd4a79c" # TU USER OBJECT ID
 }
 
 ###############################################################
@@ -66,23 +67,66 @@ resource "time_sleep" "wait_for_iam" {
 }
 
 ###############################################################
-# 6️⃣ Secretos del Key Vault
+# 6️⃣ Secretos del Key Vault — OPCIÓN A (NO falla si ya existen)
 ###############################################################
+
+########################
+# BDdatos
+########################
+data "azurerm_key_vault_secret" "bd_datos_existing" {
+  name         = "BDdatos"
+  key_vault_id = azurerm_key_vault.kv.id
+
+  lifecycle {
+    ignore_errors = true
+  }
+}
+
 resource "azurerm_key_vault_secret" "bd_datos" {
+  count = data.azurerm_key_vault_secret.bd_datos_existing.id == "" ? 1 : 0
+
   name         = "BDdatos"
   value        = var.secret_bd_datos
   key_vault_id = azurerm_key_vault.kv.id
   depends_on   = [time_sleep.wait_for_iam]
 }
 
+########################
+# userbd
+########################
+data "azurerm_key_vault_secret" "userbd_existing" {
+  name         = "userbd"
+  key_vault_id = azurerm_key_vault.kv.id
+
+  lifecycle {
+    ignore_errors = true
+  }
+}
+
 resource "azurerm_key_vault_secret" "userbd" {
+  count = data.azurerm_key_vault_secret.userbd_existing.id == "" ? 1 : 0
+
   name         = "userbd"
   value        = var.secret_userbd
   key_vault_id = azurerm_key_vault.kv.id
   depends_on   = [time_sleep.wait_for_iam]
 }
 
+########################
+# passwordbd
+########################
+data "azurerm_key_vault_secret" "passwordbd_existing" {
+  name         = "passwordbd"
+  key_vault_id = azurerm_key_vault.kv.id
+
+  lifecycle {
+    ignore_errors = true
+  }
+}
+
 resource "azurerm_key_vault_secret" "passwordbd" {
+  count = data.azurerm_key_vault_secret.passwordbd_existing.id == "" ? 1 : 0
+
   name         = "passwordbd"
   value        = var.secret_passwordbd
   key_vault_id = azurerm_key_vault.kv.id
