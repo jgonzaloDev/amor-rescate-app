@@ -5,7 +5,7 @@ terraform {
       version = "~> 3.0"
     }
     time = {
-      source  = "hashicorp/time"
+      source = "hashicorp/time"
       version = "~> 0.9"
     }
   }
@@ -62,7 +62,7 @@ resource "azurerm_role_assignment" "user_kv_admin" {
 }
 
 ###############################################################
-# 5️⃣ Espera por la propagación de IAM
+# 5️⃣ Espera propagación IAM
 ###############################################################
 resource "time_sleep" "wait_for_iam" {
   depends_on = [
@@ -73,7 +73,7 @@ resource "time_sleep" "wait_for_iam" {
 }
 
 ###############################################################
-# 6️⃣ Creación o adopción de secretos (NO FALLA)
+# 6️⃣ Secretos (CREA O ADOPTA — NO FALLA)
 ###############################################################
 
 resource "azurerm_key_vault_secret" "bd_datos" {
@@ -82,7 +82,9 @@ resource "azurerm_key_vault_secret" "bd_datos" {
   key_vault_id = azurerm_key_vault.kv.id
 
   lifecycle {
-    ignore_changes = [ value ]
+    ignore_changes = [
+      value
+    ]
   }
 
   depends_on = [time_sleep.wait_for_iam]
@@ -94,7 +96,9 @@ resource "azurerm_key_vault_secret" "userbd" {
   key_vault_id = azurerm_key_vault.kv.id
 
   lifecycle {
-    ignore_changes = [ value ]
+    ignore_changes = [
+      value
+    ]
   }
 
   depends_on = [time_sleep.wait_for_iam]
@@ -106,14 +110,16 @@ resource "azurerm_key_vault_secret" "passwordbd" {
   key_vault_id = azurerm_key_vault.kv.id
 
   lifecycle {
-    ignore_changes = [ value ]
+    ignore_changes = [
+      value
+    ]
   }
 
   depends_on = [time_sleep.wait_for_iam]
 }
 
 ###############################################################
-# 7️⃣ Lectura final de los secretos (ya existen o creados)
+# 7️⃣ Lectura final
 ###############################################################
 
 data "azurerm_key_vault_secret" "bd_datos_read" {
