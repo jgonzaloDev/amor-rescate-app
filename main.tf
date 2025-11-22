@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 3.0"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.9"
+    }
   }
   required_version = ">= 1.1.0"
 }
@@ -13,6 +17,8 @@ provider "azurerm" {
   subscription_id = var.subscription_id
   tenant_id       = var.tenant_id
 }
+
+provider "time" {}
 
 ###############################################################
 # 1️⃣ Resource Group
@@ -26,10 +32,10 @@ resource "azurerm_resource_group" "dojo" {
 # 2️⃣ Key Vault con RBAC
 ###############################################################
 resource "azurerm_key_vault" "kv" {
-  name                        = var.key_vault_name
-  resource_group_name         = azurerm_resource_group.dojo.name
-  location                    = azurerm_resource_group.dojo.location
-  tenant_id                   = var.tenant_id
+  name                = var.key_vault_name
+  resource_group_name = azurerm_resource_group.dojo.name
+  location            = azurerm_resource_group.dojo.location
+  tenant_id           = var.tenant_id
 
   sku_name                   = "standard"
   soft_delete_retention_days = 7
@@ -47,16 +53,16 @@ resource "azurerm_role_assignment" "github_kv_secrets" {
 }
 
 ###############################################################
-# 4️⃣ 🔐 TU USUARIO → Key Vault Administrator
+# 4️⃣ Tu Usuario → Key Vault Administrator
 ###############################################################
 resource "azurerm_role_assignment" "user_kv_admin" {
   scope                = azurerm_key_vault.kv.id
   role_definition_name = "Key Vault Administrator"
-  principal_id         = "d367b5ee-a181-4d51-824a-70861fd4a79c" # TU USER OBJECT ID
+  principal_id         = var.admin_user_object_id
 }
 
 ###############################################################
-# 5️⃣ Propagación RBAC (Azure se demora)
+# 5️⃣ Espera por la propagación de IAM
 ###############################################################
 resource "time_sleep" "wait_for_iam" {
   depends_on = [
@@ -67,24 +73,45 @@ resource "time_sleep" "wait_for_iam" {
 }
 
 ###############################################################
-# 6️⃣ Secretos del Key Vault (LECTURA, nunca creación)
-# 🚀 100% AUTOMÁTICO – NO FALLA – NO REQUIERE IMPORTAR
+# 6️⃣ Creación de secretos en Key Vault
 ###############################################################
 
-data "azurerm_key_vault_secret" "bd_datos" {
+resource "azurerm_key_vault_secret" "bd_datos" {
   name         = "BDdatos"
+  value        = var.sql_database_name
   key_vault_id = azurerm_key_vault.kv.id
   depends_on   = [time_sleep.wait_for_iam]
 }
 
-data "azurerm_key_vault_secret" "userbd" {
+resource "azurerm_key_vault_secret" "userbd" {
   name         = "userbd"
+  value        = var.sql_admin_login
   key_vault_id = azurerm_key_vault.kv.id
   depends_on   = [time_sleep.wait_for_iam]
 }
 
-data "azurerm_key_vault_secret" "passwordbd" {
+resource "azurerm_key_vault_secret" "passwordbd" {
   name         = "passwordbd"
+  value        = var.sql_admin_password
   key_vault_id = azurerm_key_vault.kv.id
   depends_on   = [time_sleep.wait_for_iam]
+}
+
+###############################################################
+# 7️⃣ Lectura de los secretos (YA con valor)
+###############################################################
+
+data "azurerm_key_vault_secret" "bd_datos_read" {
+  name         = azurerm_key_vault_secret.bd_datos.name
+  key_vault_id = azurerm_key_vault.kv.id
+}
+
+data "azurerm_key_vault_secret" "userbd_read" {
+  name         = azurerm_key_vault_secret.userbd.name
+  key_vault_id = azurerm_key_vault.kv.id
+}
+
+data "azurerm_key_vault_secret" "passwordbd_read" {
+  name         = azurerm_key_vault_secret.passwordbd.name
+  key_vault_id = azurerm_key_vault.kv.id
 }

@@ -31,31 +31,40 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      # 4️⃣ Init
+      # 4️⃣ Terraform Init
       - name: Terraform Init
         run: terraform init
 
-      # 5️⃣ Apply con todas las variables
+      # 5️⃣ Terraform Apply
       - name: Terraform Apply
         run: terraform apply -auto-approve
         env:
-          # Azure
-          TF_VAR_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          TF_VAR_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
-          TF_VAR_location: ${{ secrets.TF_VAR_LOCATION }}
-          TF_VAR_resource_group_name: ${{ secrets.TF_VAR_RESOURCE_GROUP_NAME }}
+          # ========================
+          # 🔵 Parámetros de Azure
+          # ========================
+          TF_VAR_subscription_id:       ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          TF_VAR_tenant_id:             ${{ secrets.AZURE_TENANT_ID }}
+          TF_VAR_location:              ${{ secrets.TF_VAR_LOCATION }}
+          TF_VAR_resource_group_name:   ${{ secrets.TF_VAR_RESOURCE_GROUP_NAME }}
 
-          # Key Vault
-          TF_VAR_key_vault_name: ${{ secrets.TF_VAR_KEY_VAULT_NAME }}
+          # ========================
+          # 🔐 Key Vault
+          # ========================
+          TF_VAR_key_vault_name:        ${{ secrets.TF_VAR_KEY_VAULT_NAME }}
 
-          # GitHub Federated Credential
-          TF_VAR_github_principal_id: ${{ secrets.AZURE_FEDERATED_OBJID }}
+          # ========================
+          # 🔵 GitHub Federated Credential (OIDC)
+          # ========================
+          TF_VAR_github_principal_id:   ${{ secrets.AZURE_FEDERATED_OBJID }}
 
-          # Usuario administrador (TÚ)
-          TF_VAR_admin_user_object_id: ${{ secrets.ADMIN_USER_OBJECT_ID }}
+          # ========================
+          # 👤 Usuario administrador del Key Vault
+          # ========================
+          TF_VAR_admin_user_object_id:  ${{ secrets.ADMIN_USER_OBJECT_ID }}
 
-          # Secretos del Key Vault (desde GitHub)
-          TF_VAR_secret_bd_datos:    ${{ secrets.TF_VAR_SQL_DATABASE_NAME }}
-          TF_VAR_secret_userbd:      ${{ secrets.TF_VAR_SQL_ADMIN_LOGIN }}
-          TF_VAR_secret_passwordbd:  ${{ secrets.TF_VAR_SQL_ADMIN_PASSWORD }}
-
+          # ========================
+          # 🔑 Secretos para crear dentro del Key Vault
+          # ========================
+          TF_VAR_sql_database_name:     ${{ secrets.TF_VAR_SQL_DATABASE_NAME }}
+          TF_VAR_sql_admin_login:       ${{ secrets.TF_VAR_SQL_ADMIN_LOGIN }}
+          TF_VAR_sql_admin_password:    ${{ secrets.TF_VAR_SQL_ADMIN_PASSWORD }}

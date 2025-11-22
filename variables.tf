@@ -31,3 +31,15 @@ variable "admin_user_object_id" {
   type        = string
   description = "Object ID del usuario administrador que puede leer y administrar secretos"
 }
+variable "sql_database_name" {
+  type = string
+}
+
+variable "sql_admin_login" {
+  type = string
+}
+
+variable "sql_admin_password" {
+  type = string
+}
+
